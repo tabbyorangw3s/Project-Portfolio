@@ -20,7 +20,7 @@ export default function Contact() {
 
   return (
     <SectionBlock
-      id="contact"
+      id="contact-form"
       labelledBy="contact-title"
       title="Contact Me"
       text="Have a project idea or want to connect? Just say hi!"

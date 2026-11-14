@@ -1,8 +1,15 @@
 import { Moon, Sun } from "lucide-react";
 import SparkleIcon from "./SparkleIcon";
-import ResumeViewer from "./ResumeViewer";
 
-export default function Navbar({ theme, onToggleTheme }) {
+const pages = [
+  { id: "home", label: "Home" },
+  { id: "work", label: "Work" },
+  { id: "journey", label: "Journey" },
+  { id: "highlights", label: "Highlights" },
+  { id: "contact", label: "Contact" },
+];
+
+export default function Navbar({ theme, activePage, onToggleTheme }) {
   const isDark = theme === "dark";
   const toggleLabel = isDark ? "Switch to light mode" : "Switch to dark mode";
 
@@ -10,14 +17,20 @@ export default function Navbar({ theme, onToggleTheme }) {
     <header className="site-header">
       <div className="header-row">
         <div className="pink-dash" aria-hidden="true" />
-        <a className="brand" href="#top" aria-label="Sophia Rhyzelle, back to top">
+        <a className="brand" href="#home" aria-label="Sophia Rhyzelle, home">
           <SparkleIcon size={42} />
           <span>Sophia Rhyzelle</span>
         </a>
         <nav className="nav-links" aria-label="Primary">
-          <a href="#projects">Portfolio</a>
-          <a href="#contact">Hire Me</a>
-          <ResumeViewer />
+          {pages.map((page) => (
+            <a
+              key={page.id}
+              href={`#${page.id}`}
+              aria-current={activePage === page.id ? "page" : undefined}
+            >
+              {page.label}
+            </a>
+          ))}
           <button
             className="theme-toggle"
             type="button"

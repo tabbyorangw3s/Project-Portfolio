@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Achievements from "./components/Achievements";
 import Contact from "./components/Contact";
 import Education from "./components/Education";
@@ -8,6 +8,9 @@ import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import LearningNotebook from "./components/LearningNotebook";
 import Navbar from "./components/Navbar";
+import PageDirectory from "./components/PageDirectory";
+import PageHeading from "./components/PageHeading";
+import ResumeViewer from "./components/ResumeViewer";
 import Skills from "./components/Skills";
 import WhatIDo from "./components/WhatIDo";
 
@@ -35,15 +38,58 @@ const ambientSparkles = [
 ];
 
 const themeStorageKey = "sophia-portfolio-theme";
+const pageIds = ["home", "work", "journey", "highlights", "contact"];
+const pageAliases = {
+  top: "home",
+  projects: "work",
+  skills: "work",
+  education: "journey",
+  experience: "journey",
+  achievements: "highlights",
+  notebook: "highlights",
+};
+
+function getPageFromHash() {
+  const hash = window.location.hash.slice(1);
+  const page = pageAliases[hash] || hash;
+  return pageIds.includes(page) ? page : "home";
+}
 
 export default function App() {
   const [theme, setTheme] = useState(() =>
     window.localStorage.getItem(themeStorageKey) === "dark" ? "dark" : "light",
   );
+  const [activePage, setActivePage] = useState(getPageFromHash);
+  const previousHash = useRef(window.location.hash);
 
   useEffect(() => {
     window.localStorage.setItem(themeStorageKey, theme);
   }, [theme]);
+
+  useEffect(() => {
+    function handleHashChange() {
+      setActivePage(getPageFromHash());
+    }
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (previousHash.current !== window.location.hash) {
+      document.getElementById(`page-title-${activePage}`)?.focus({ preventScroll: true });
+    }
+    previousHash.current = window.location.hash;
+    const pageTitles = {
+      home: "Home",
+      work: "Work & Skills",
+      journey: "My Journey",
+      highlights: "Highlights",
+      contact: "Contact",
+    };
+    document.title = `${pageTitles[activePage]} — Sophia Rhyzelle Beloro`;
+  }, [activePage]);
 
   useEffect(() => {
     if (
@@ -81,7 +127,7 @@ export default function App() {
         target.style.removeProperty("--reveal-delay");
       });
     };
-  }, []);
+  }, [activePage]);
 
   return (
     <div className="page" data-theme={theme}>
@@ -108,20 +154,76 @@ export default function App() {
       <div className="frame">
         <Navbar
           theme={theme}
+          activePage={activePage}
           onToggleTheme={() =>
             setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"))
           }
         />
-        <main>
-          <Hero />
-          <WhatIDo />
-          <FeaturedProjects />
-          <Achievements />
-          <Education />
-          <Experience />
-          <Skills />
-          <LearningNotebook />
-          <Contact />
+        <main key={activePage} className="page-view-transition">
+          {activePage === "home" && (
+            <>
+              <Hero />
+              <WhatIDo />
+              <PageDirectory />
+            </>
+          )}
+          {activePage === "work" && (
+            <>
+              <PageHeading
+                id="work"
+                number="02"
+                title="Work & Skills"
+                text="Projects I’ve built, plus the languages and tools I use to bring ideas to life."
+              />
+              <FeaturedProjects />
+              <Skills />
+            </>
+          )}
+          {activePage === "journey" && (
+            <>
+              <PageHeading
+                id="journey"
+                number="03"
+                title="My Journey"
+                text="The education, experiences, and people shaping my path in technology."
+              />
+              <Education />
+              <Experience />
+            </>
+          )}
+          {activePage === "highlights" && (
+            <>
+              <PageHeading
+                id="highlights"
+                number="04"
+                title="Highlights"
+                text="A few proud moments, and a peek at what I’m learning right now."
+              />
+              <Achievements />
+              <LearningNotebook />
+            </>
+          )}
+          {activePage === "contact" && (
+            <>
+              <PageHeading
+                id="contact"
+                number="05"
+                title="Let’s Connect"
+                text="Have an idea or want to work together? I’d love to hear from you."
+              />
+              <Contact />
+              <section className="resume-section" aria-labelledby="resume-section-title">
+                <div>
+                  <p className="resume-eyebrow">A little look at my work</p>
+                  <h2 id="resume-section-title">Want the quick version?</h2>
+                  <p className="resume-section-text">
+                    Preview my resume or save a copy for later.
+                  </p>
+                </div>
+                <ResumeViewer />
+              </section>
+            </>
+          )}
         </main>
         <Footer />
       </div>

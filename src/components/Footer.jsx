@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="footer-row">
         <div className="footer-brand-stack">
-          <a className="brand brand-small" href="#top">
+          <a className="brand brand-small" href="#home">
             <SparkleIcon size={28} />
             <span>Sophia Rhyzelle</span>
           </a>
